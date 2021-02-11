@@ -21,7 +21,7 @@ class EndpointController extends AbstractController
     }
 
     /**
-     * @Route("/endpoint", name="endpoint")
+     * @Route("/pay-in", name="pay_in")
      */
     public function create(LoggerInterface  $logger): Response
     {
