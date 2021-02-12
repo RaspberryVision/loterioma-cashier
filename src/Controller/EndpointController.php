@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Transaction;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,11 +27,25 @@ class EndpointController extends AbstractController
     /**
      * @Route("/pay-in", name="pay_in")
      */
-    public function create(LoggerInterface  $logger): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $logger->info('ELO');
+        $data = json_decode($request->getContent(), true);
+
+        /** @var User $user */
+        $user = $entityManager->getRepository(User::class)->find(1);
+
+        $transaction = new Transaction();
+        $transaction
+            ->setAmount(100)
+            ->setType(2);
+
+        $user->addTransaction($transaction);
+
+        $entityManager->persist($transaction);
+        $entityManager->flush();
+
         return $this->json([
-            'message' => 'Welcome to your new controller!',
+            'transactionId' => $transaction->getId(),
             'path' => 'src/Controller/EndpointController.php',
         ]);
     }
