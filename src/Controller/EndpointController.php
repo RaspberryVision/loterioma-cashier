@@ -18,10 +18,12 @@ class EndpointController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/EndpointController.php',
-        ]);
+        return $this->json(
+            [
+                'message' => 'Welcome to your new controller!',
+                'path' => 'src/Controller/EndpointController.php',
+            ]
+        );
     }
 
     /**
@@ -34,6 +36,16 @@ class EndpointController extends AbstractController
         /** @var User $user */
         $user = $entityManager->getRepository(User::class)->find(1);
 
+        if ($user->getWallet()->getAmount() - 100 < 0) {
+            // error
+            return $this->json(
+                [
+                    'code' => 100,
+                    'status' => 1,
+                ]
+            );
+        }
+
         $transaction = new Transaction();
         $transaction
             ->setAmount(100)
@@ -44,9 +56,12 @@ class EndpointController extends AbstractController
         $entityManager->persist($transaction);
         $entityManager->flush();
 
-        return $this->json([
-            'transactionId' => $transaction->getId(),
-            'path' => 'src/Controller/EndpointController.php',
-        ]);
+        return $this->json(
+            [
+                'code' => 100,
+                'status' => 0,
+                'transactionId' => $transaction->getId(),
+            ]
+        );
     }
 }
