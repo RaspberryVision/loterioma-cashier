@@ -29,14 +29,15 @@ class EndpointController extends AbstractController
     /**
      * @Route("/pay-in", name="pay_in")
      */
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, LoggerInterface $logger): Response
     {
         $data = json_decode($request->getContent(), true);
+        $logger->info($request->getContent())   ;
 
         /** @var User $user */
-        $user = $entityManager->getRepository(User::class)->find(1);
+        $user = $entityManager->getRepository(User::class)->find($data['gameId']);
 
-        if ($user->getWallet()->getAmount() - 100 < 0) {
+        if ($user->getWallet()->getAmount() - $data['amount'] < 0) {
             // error
             return $this->json(
                 [
@@ -48,7 +49,7 @@ class EndpointController extends AbstractController
 
         $transaction = new Transaction();
         $transaction
-            ->setAmount(100)
+            ->setAmount($data['amount'])
             ->setType(2);
 
         $user->addTransaction($transaction);
@@ -58,7 +59,6 @@ class EndpointController extends AbstractController
 
         return $this->json(
             [
-                'code' => 100,
                 'status' => 0,
                 'transactionId' => $transaction->getId(),
             ]
