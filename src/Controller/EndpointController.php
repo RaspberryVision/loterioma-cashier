@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Message\Wallet\UserWalletUpdated;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,7 +33,7 @@ class EndpointController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager, LoggerInterface $logger): Response
     {
         $data = json_decode($request->getContent(), true);
-        $logger->info($request->getContent())   ;
+        $logger->info($request->getContent());
 
         /** @var User $user */
         $user = $entityManager->getRepository(User::class)->find($data['gameId']);
@@ -59,11 +60,17 @@ class EndpointController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        $this->dispatchMessage(
+            new UserWalletUpdated(json_encode([
+                'amount' => $user->getWallet()->getAmount()
+            ]))
+        );
+
         return $this->json(
             [
                 'status' => 0,
                 'transactionId' => $transaction->getId(),
-                'wallet' => $user->getWallet()->getAmount()
+                'wallet' => $user->getWallet()->getAmount(),
             ]
         );
     }
