@@ -54,13 +54,16 @@ class EndpointController extends AbstractController
 
         $user->addTransaction($transaction);
 
-        $entityManager->persist($transaction);
+        $user->getWallet()->setAmount($user->getWallet()->getAmount() - $data['amount']);
+
+        $entityManager->persist($user);
         $entityManager->flush();
 
         return $this->json(
             [
                 'status' => 0,
                 'transactionId' => $transaction->getId(),
+                'wallet' => $user->getWallet()->getAmount()
             ]
         );
     }
