@@ -62,6 +62,7 @@ class EndpointController extends AbstractController
 
         $this->dispatchMessage(
             new UserWalletUpdated(json_encode([
+                'id' => $user->getId(),
                 'amount' => $user->getWallet()->getAmount()
             ]))
         );
