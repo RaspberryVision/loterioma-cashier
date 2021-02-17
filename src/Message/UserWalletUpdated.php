@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Message\Wallet;
+namespace App\Message;
 
 
 class UserWalletUpdated
