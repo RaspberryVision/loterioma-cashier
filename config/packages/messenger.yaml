@@ -6,7 +6,7 @@ framework:
         dsn: "%env(MESSENGER_TRANSPORT_DSN_DOCTRINE)%"
         options:
           queue_name: normal_priority
-      async_priority_low: '%env(MESSENGER_TRANSPORT_DSN_REDIS)%'
+#      async_priority_low: '%env(MESSENGER_TRANSPORT_DSN_REDIS)%'
 
     routing:
       # Route your messages to the transports
